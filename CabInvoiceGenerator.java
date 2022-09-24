@@ -1,52 +1,25 @@
-package com.bridgelabz;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+package com.bridgelabz.test;
 
 public class CabInvoiceGenerator {
-    static List<Customer> customerList = new ArrayList<>();
+    public final int COST_PER_KM = 10;
+    public final int COST_PER_MINUTE = 1;
+    public int minFare = 5;
 
-    public static double calculateFare(double distance, int time) {
-        double totalFare = distance * Ride.Category.NORMAL_RIDE.costPerKm + time * Ride.Category.NORMAL_RIDE.costPerMinute;
-        if(totalFare < Ride.Category.NORMAL_RIDE.minimumFarePerRide) {
-            return Ride.Category.NORMAL_RIDE.minimumFarePerRide;
-
-        }else {
-            return totalFare;
+    public double calculateFare(double distance, int time) {
+        double totalFare = COST_PER_KM*distance + COST_PER_MINUTE*time;
+        if(totalFare < minFare ){
+            totalFare = minFare;
         }
-    }
-
-    public static double calculatePremiumFare(double distance, int time){
-        double totalFare = distance*Ride.Category.PREMIUM_RIDE.costPerKm + time *Ride.Category.PREMIUM_RIDE.costPerMinute;
-        return totalFare < Ride.Category.PREMIUM_RIDE.minimumFarePerRide?Ride.Category.PREMIUM_RIDE.minimumFarePerRide:totalFare;
-
-
-    }
-
-    public static double calculateFare(Ride[] rides) {
-        double totalFare = 0;
-        for(Ride ride : rides){
-            if(ride.getCategory() == Ride.Category.PREMIUM_RIDE){
-            totalFare += calculatePremiumFare(ride.getDistance(),ride.getTime());
-        }else{
-                totalFare += calculateFare(ride.getDistance(),ride.getTime());
-            }
-
-            }
         return totalFare;
     }
 
-    public static Invoice generateInvoice(Ride[] rides) {
-        double totalFare = calculateFare(rides);
-        int totalNumberOfRides = rides.length;
-        double averageFarePerRide = totalFare / totalNumberOfRides;
-        return new Invoice(totalNumberOfRides, totalFare, averageFarePerRide);
+    public double calculateFare(Ride[] rides) {
+        double totalFare = 0.0;
+        for(Ride ride : rides)
+            totalFare += this.calculateFare(ride.distance, ride.time);
+
+        return totalFare;
     }
 
-    public static Invoice generateInvoice(int id) {
-        List<Customer> customerList1 = customerList.stream().filter(customer -> customer.id == id).collect(Collectors.toList());
-        Customer customer = customerList1.get(0);
-        return generateInvoice(customer.rideList);
-    }
+
 }
